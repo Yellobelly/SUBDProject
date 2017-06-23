@@ -1,9 +1,57 @@
 package JDBCdemo;
 
 import java.sql.*;
+import java.util.Scanner;
 
 public class Driver {
-
+	
+	
+	//insert function with PreparedStatements
+	public static void addNewBook(Connection con, String name, String date, String ISBN) throws SQLException{
+		PreparedStatement pstmt = null;
+		
+	    String insertString = "INSERT INTO LIBRARY.BOOKS(NAME, DATEOFISSUE, ISBN)" +
+				"values( ? , ? , ? )";
+	    try {
+	        con.setAutoCommit(false);
+	        pstmt = con.prepareStatement(insertString);
+	        
+	        pstmt.setString(1,name);
+	        pstmt.setString(2,date);
+	        pstmt.setString(3,ISBN);
+	        
+	        pstmt.executeUpdate();	
+	      
+	    } catch (SQLException e ) {
+	    	e.printStackTrace();
+	    } finally {
+	       pstmt.close();
+	    }
+		
+	}
+	
+	//delete function with PreparedStatements
+	public static void deleteBook(Connection con, String name) throws SQLException{
+		PreparedStatement pstmt = null;
+		
+	    String insertString = "DELETE FROM Books " +
+                "WHERE name = ?";
+	    try {
+	        con.setAutoCommit(false);
+	        pstmt = con.prepareStatement(insertString);
+	        
+	        pstmt.setString(1,name);
+	        
+	        pstmt.executeUpdate();	
+	      
+	    } catch (SQLException e ) {
+	    	e.printStackTrace();
+	    } finally {
+	       pstmt.close();
+	    }
+		
+	}
+	
 	public static void main(String[] args) {
 		
 		try{
@@ -84,6 +132,25 @@ public class Driver {
 					"values('BUM BIM','2015-06-12','0987654321555')";
 			Stmt.executeUpdate(inputs);
 			
+			//Using PreparedStatement function
+			String name = "THIsIsATEST";
+			String date = "2025-06-12";
+			String ISBN = "0666666666666";
+			addNewBook(Conn, name, date, ISBN);
+			
+			
+			//user input
+			Scanner scanner = new Scanner (System.in);
+			System.out.print("enter a name to of the book"  +  "\n"); 
+			name = scanner.next();
+			System.out.print("date of issue");
+			date = scanner.next();
+			System.out.print("and ISBN");
+			ISBN = scanner.next();
+			scanner.close();
+			addNewBook(Conn, name, date, ISBN);
+			
+			
 			
 			
 			inputs = "INSERT INTO Library.Authors(name)" +
@@ -147,6 +214,7 @@ public class Driver {
 					"values(6,2)";
 			Stmt.executeUpdate(inputs);
 			
+		
 			
 			//UPDATE
 			 String sql = "UPDATE Books " +
@@ -154,9 +222,8 @@ public class Driver {
 			 Stmt.executeUpdate(sql);
 			
 			 //DELETE
-			 sql = "DELETE FROM Books " +
-	                   "WHERE name = 'Hobbit'";
-			 Stmt.executeUpdate(sql);
+			 //deleteBook(connection, name of the book to delete);
+			 deleteBook(Conn, "Hobbit");
 			 
 			//executing SQL query
 			ResultSet Res = Stmt.executeQuery("Select * from Books");
